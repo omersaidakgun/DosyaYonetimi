@@ -57,6 +57,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddScoped<FolderRepository>();
 builder.Services.AddScoped<FileItemRepository>();
+builder.Services.AddScoped<FavoriteRepository>();
+builder.Services.AddScoped<FileShareRepository>();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<MapProfile>();

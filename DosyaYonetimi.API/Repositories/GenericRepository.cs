@@ -37,6 +37,7 @@ namespace DosyaYonetimi.API.Repositories
             await _context.SaveChangesAsync();
         }
 
+        //soft delete
         public async Task DeleteAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);

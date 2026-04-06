@@ -11,6 +11,8 @@ namespace DosyaYonetimi.API.Models
         
         public DbSet<Folder> Folders { get; set; }
         public DbSet<FileItem> Files { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<FileShare> FileShares { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)
         {
