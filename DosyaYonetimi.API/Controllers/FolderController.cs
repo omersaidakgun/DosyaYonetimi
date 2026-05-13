@@ -29,10 +29,14 @@ namespace DosyaYonetimi.API.Controllers
         [HttpGet]
         public async Task<List<FolderDto>> List()
         {
-            var folders = await _folderRepository.GetAllAsync();
-            var folderDtos = _mapper.Map<List<FolderDto>>(folders);
+            
+            
 
             
+            var folders = await _folderRepository.Where(f => f.IsActive).ToListAsync();
+
+            var folderDtos = _mapper.Map<List<FolderDto>>(folders);
+
             if (!User.IsInRole("Admin"))
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -74,16 +78,17 @@ namespace DosyaYonetimi.API.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             
-            var list = _folderRepository.Where(s => s.Name == model.Name && s.AppUserId == userId).ToList();
+            var list = _folderRepository.Where(s => s.Name == model.Name && s.AppUserId == userId && s.IsActive).ToList();
+
             if (list.Count > 0)
             {
                 _result.Status = false;
-                _result.Message = "Bu isimde bir klasörünüz zaten var!";
+                _result.Message = "Bu isimde aktif bir klasörünüz zaten var!";
                 return _result;
             }
 
             var folder = _mapper.Map<Folder>(model);
-            folder.AppUserId = userId; 
+            folder.AppUserId = userId;
             folder.Created = DateTime.Now;
             folder.Updated = DateTime.Now;
             folder.IsActive = true;
@@ -133,5 +138,70 @@ namespace DosyaYonetimi.API.Controllers
             _result.Message = "Klasör Silindi (Çöp Kutusuna Taşındı)";
             return _result;
         }
+
+        [HttpGet("DeletedFolders")]
+        public async Task<List<FolderDto>> DeletedFolders()
+        {
+            
+            var folders = await _folderRepository.Where(s => !s.IsActive).ToListAsync();
+            var folderDtos = _mapper.Map<List<FolderDto>>(folders);
+
+            
+            if (!User.IsInRole("Admin"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                folderDtos = folderDtos.Where(s => s.AppUserId == userId).ToList();
+            }
+
+            return folderDtos;
+        }
+
+        [HttpPost("Restore/{id}")]
+        public async Task<ResultDto> Restore(int id)
+        {
+            var folder = await _folderRepository.GetByIdAsync(id);
+            if (folder == null)
+            {
+                _result.Status = false;
+                _result.Message = "Klasör bulunamadı!";
+                return _result;
+            }
+
+            folder.IsActive = true; 
+            folder.Updated = DateTime.Now;
+
+            await _folderRepository.UpdateAsync(folder);
+
+            _result.Status = true;
+            _result.Message = "Klasör başarıyla geri yüklendi.";
+            return _result;
+        }
+
+        [HttpDelete("HardDelete/{id}")]
+        public async Task<ResultDto> HardDelete(int id)
+        {
+            var folder = await _folderRepository.GetByIdAsync(id);
+            if (folder == null)
+            {
+                _result.Status = false;
+                _result.Message = "Klasör bulunamadı!";
+                return _result;
+            }
+
+            
+            _folderRepository._context.Folders.Remove(folder);
+            await _folderRepository._context.SaveChangesAsync();
+
+            _result.Status = true;
+            _result.Message = "Klasör kalıcı olarak silindi.";
+            return _result;
+        }
+
+
+
+
+
+
+
     }
 }

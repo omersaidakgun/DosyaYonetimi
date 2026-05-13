@@ -32,7 +32,7 @@ namespace DosyaYonetimi.API.Controllers
             _signInManager = signInManager;
         }
 
-        //GÖRÜNTÜLEME
+        
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -51,7 +51,7 @@ namespace DosyaYonetimi.API.Controllers
             return userDto;
         }
 
-        // KAYIT  
+        
 
         [HttpPost]
         [AllowAnonymous]
@@ -143,7 +143,7 @@ namespace DosyaYonetimi.API.Controllers
             return result;
         }
 
-        //GÜNCELLEME
+        
 
         [HttpPut]
         public async Task<ResultDto> Update(RegisterDto dto)
@@ -167,7 +167,7 @@ namespace DosyaYonetimi.API.Controllers
             return result;
         }
 
-        //KOTA İŞLEMLERİ
+        //KOTA 
         [HttpPut]
         [Authorize(Roles = "Admin")] 
         public async Task<ResultDto> UpdateQuota(UpdateQuotaDto dto)

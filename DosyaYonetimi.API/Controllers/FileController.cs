@@ -58,7 +58,7 @@ namespace DosyaYonetimi.API.Controllers
         
         [Route("Upload")]
         [HttpPost]
-        public async Task<ResultDto> Upload(UploadDto dto)
+        public async Task<ResultDto> Upload([FromBody] UploadDto dto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var user = await _userManager.FindByIdAsync(userId);
@@ -93,7 +93,7 @@ namespace DosyaYonetimi.API.Controllers
 
             var fileItem = new FileItem
             {
-                Name = "Yeni_Dosya" + dto.FileExt,
+                Name = dto.FileName + dto.FileExt,
                 SystemFileName = systemFileName,
                 Extension = dto.FileExt,
                 SizeInMB = fileSizeMB,
@@ -156,7 +156,7 @@ namespace DosyaYonetimi.API.Controllers
             return _result;
         }
 
-        //ÇÖP KUTUSU YÖNETİMİ
+        
 
         [HttpGet("DeletedFiles")]
         [Authorize(Roles = "Admin")]
@@ -211,17 +211,26 @@ namespace DosyaYonetimi.API.Controllers
                 return _result;
             }
 
+            
+            var relatedFavorites = _fileItemRepository._context.Favorites.Where(f => f.FileItemId == id);
+            _fileItemRepository._context.Favorites.RemoveRange(relatedFavorites);
+
+            var relatedShares = _fileItemRepository._context.FileShares.Where(s => s.FileItemId == id);
+            _fileItemRepository._context.FileShares.RemoveRange(relatedShares);
+
+            
             var path = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot/Files/UserUploads", file.SystemFileName);
             if (System.IO.File.Exists(path))
             {
                 System.IO.File.Delete(path);
             }
 
+            
             _fileItemRepository._context.Files.Remove(file);
             await _fileItemRepository._context.SaveChangesAsync();
 
             _result.Status = true;
-            _result.Message = "Dosya sunucudan kalıcı olarak temizlendi.";
+            _result.Message = "Dosya ve bağlı tüm kayıtlar kalıcı olarak silindi.";
             return _result;
         }
     }

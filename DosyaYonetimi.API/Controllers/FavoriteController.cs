@@ -38,8 +38,25 @@ namespace DosyaYonetimi.API.Controllers
         [HttpPost("AddFavorite")]
         public async Task<ResultDto> Add(FavoriteAddDto dto)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
+            
+            var existingFavorite = await _favoriteRepository
+                .Where(f => f.AppUserId == userId && f.FileItemId == dto.FileItemId && f.IsActive)
+                .FirstOrDefaultAsync();
+
+            if (existingFavorite != null)
+            {
+                
+                _favoriteRepository._context.Favorites.Remove(existingFavorite);
+                await _favoriteRepository._context.SaveChangesAsync();
+
+                _result.Status = true;
+                _result.Message = "Favorilerden çıkarıldı.";
+                return _result;
+            }
+
+            
             var favorite = new Favorite
             {
                 AppUserId = userId,
@@ -50,9 +67,8 @@ namespace DosyaYonetimi.API.Controllers
             };
 
             await _favoriteRepository.AddAsync(favorite);
-
             _result.Status = true;
-            _result.Message = "Dosya başarıyla favorilere eklendi.";
+            _result.Message = "Favorilere eklendi.";
             return _result;
         }
     }

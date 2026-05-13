@@ -1,0 +1,126 @@
+﻿@model List<DosyaYonetimi.UI.Models.UserViewModel>
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-users text-primary mr-2"></i> Sistem Kullanıcıları</h1>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Hata!</strong> @TempData["Error"]
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Başarılı!</strong> @TempData["Success"]
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    </div>
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Kayıtlı Tüm Kullanıcılar</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" width="100%" cellspacing="0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>E-Posta</th>
+                        <th width="30%">Kota Kullanımı</th>
+                        <th width="15%" class="text-center">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var user in Model)
+                        {
+                            int percentage = user.StorageQuota > 0 ? (int)Math.Round((double)user.UsedStorage / user.StorageQuota * 100) : 0;
+                            string pbColor = percentage > 85 ? "bg-danger" : (percentage > 60 ? "bg-warning" : "bg-success");
+
+                            <tr>
+                                <td class="align-middle font-weight-bold text-dark">
+                                    @user.UserName
+                                </td>
+                                <td class="align-middle">@user.Email</td>
+                                <td class="align-middle">
+                                    <div class="d-flex justify-content-between text-xs mb-1">
+                                        <span>@user.UsedStorage MB / @user.StorageQuota MB</span>
+                                        <span class="font-weight-bold">%@percentage</span>
+                                    </div>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar @pbColor" role="progressbar" style="width: @percentage%"></div>
+                                    </div>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <button class="btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#quotaModal" data-id="@user.Id" data-name="@user.UserName" data-quota="@user.StorageQuota">
+                                        <i class="fas fa-hdd"></i> Kota Güncelle
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">Sistemde henüz kayıtlı kullanıcı yok.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="quotaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="UpdateQuota" asp-controller="Admin" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold text-primary">Kota Güncelle: <span id="modalUserName" class="text-dark"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="userId" id="modalUserId" />
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">Yeni Kota (MB)</label>
+                        <input type="number" name="newStorageQuota" id="modalUserQuota" class="form-control form-control-user" required min="1" />
+                        <small class="form-text text-muted">Kullanıcının mevcut kotasını düşürürken, dolu alanından daha aza indiremezsiniz.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#quotaModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); 
+
+            
+            var id = button.data('id');
+            var name = button.data('name');
+            var quota = button.data('quota');
+
+            
+            var modal = $(this);
+            modal.find('#modalUserId').val(id);
+            modal.find('#modalUserName').text(name);
+            modal.find('#modalUserQuota').val(quota);
+        });
+    </script>
+}

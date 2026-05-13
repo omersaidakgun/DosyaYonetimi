@@ -1,0 +1,27 @@
+﻿@model IEnumerable<DosyaYonetimi.UI.Models.FileItemViewModel>
+@{
+    ViewData["Title"] = "Favoriler";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Dosya Yöneticisi</h1>
+
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/Files"><i class="fas fa-file"></i> Tüm Dosyalar</a></li>
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/Folders"><i class="fas fa-folder"></i> Klasörler</a></li>
+    <li class="nav-item"><a class="nav-link active font-weight-bold" href="/Home/Favorites"><i class="fas fa-star"></i> Favoriler</a></li>
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/SharedFiles"><i class="fas fa-share-alt"></i> Paylaşılanlar</a></li>
+</ul>
+
+<div class="card shadow mb-4 border-left-warning">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <p>Favori dosyalarınız burada listelenir...</p>
+        }
+        else
+        {
+            <p class="text-muted">Henüz favoriye aldığınız bir dosya yok.</p>
+        }
+    </div>
+</div>

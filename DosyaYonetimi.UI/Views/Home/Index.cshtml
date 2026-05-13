@@ -1,8 +1,100 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DosyaYonetimi.UI.Models.UserSummaryViewModel
+
+@{
+    ViewData["Title"] = "Genel Bakış";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    
+    int percentage = 0;
+    if (Model != null && Model.TotalQuotaMB > 0)
+    {
+        percentage = (int)Math.Round((double)Model.UsedStorageMB / Model.TotalQuotaMB * 100);
+
+        
+        if (percentage > 100) percentage = 100;
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Genel Bakış</h1>
+</div>
+
+<div class="row">
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Toplam Dosya</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.TotalFiles ?? 0) Adet</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Toplam Klasör</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.TotalFolders ?? 0) Adet</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-folder fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Kota Kullanımı</div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">%@percentage</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm text-muted">
+                            Kullanılan: <strong>@(Model?.UsedStorageMB ?? 0) MB</strong> / Toplam: @(Model?.TotalQuotaMB ?? 0) MB
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-hdd fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Hoş Geldiniz!</h6>
+            </div>
+            <div class="card-body">
+                <p>Dosya Yönetim Portalı üzerinden dosyalarınızı yükleyebilir, klasörler oluşturabilir ve diğer kullanıcılarla güvenli bir şekilde paylaşabilirsiniz.</p>
+                <a href="/Home/Files" class="btn btn-primary">
+                    <i class="fas fa-arrow-right fa-sm text-white-50"></i> Dosyalarımı Görüntüle
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

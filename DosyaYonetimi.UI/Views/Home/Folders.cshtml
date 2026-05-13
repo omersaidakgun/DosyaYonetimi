@@ -1,0 +1,43 @@
+﻿@model IEnumerable<DosyaYonetimi.UI.Models.FolderViewModel>
+@{
+    ViewData["Title"] = "Klasörler";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Dosya Yöneticisi</h1>
+
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/Files"><i class="fas fa-file"></i> Tüm Dosyalar</a></li>
+    <li class="nav-item"><a class="nav-link active font-weight-bold" href="/Home/Folders"><i class="fas fa-folder"></i> Klasörler</a></li>
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/Favorites"><i class="fas fa-star"></i> Favoriler</a></li>
+    <li class="nav-item"><a class="nav-link text-gray-600" href="/Home/SharedFiles"><i class="fas fa-share-alt"></i> Paylaşılanlar</a></li>
+</ul>
+
+<div class="mb-3">
+    <button class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Yeni Klasör Ekle</button>
+</div>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@item.Name</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-folder fa-2x text-success"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12"><div class="alert alert-info">Klasör bulunamadı.</div></div>
+    }
+</div>
